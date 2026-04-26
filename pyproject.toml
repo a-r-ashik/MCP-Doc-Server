@@ -1,0 +1,21 @@
+[project]
+name = "mcp-server-python"
+version = "0.3.0"
+description = "MCP documentation retrieval server — Windows-compatible, 4 tools"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp>=2.12.2",
+    "groq>=0.31.0",
+    "httpx>=0.28.1",
+    "mcp>=1.9.0",
+    "python-dotenv>=1.1.1",
+    "trafilatura>=2.0.0",
+]
+
+[project.optional-dependencies]
+# Install Playwright for JS-heavy doc sites (LangChain, Pinecone, FastAPI)
+# Run: uv sync --extra js && playwright install chromium
+js = [
+    "playwright>=1.49.0",
+]

@@ -1,0 +1,22 @@
+{
+  "1": "Copy this config into: %APPDATA%\\Claude\\claude_desktop_config.json",
+  "2": "Replace YOUR_NAME and YOUR_KEYS with real values. Use double backslashes in Windows paths.",
+  "3": "Find your uv path by running: where.exe uv  in PowerShell",
+
+  "mcpServers": {
+    "docs-server": {
+      "command": "C:\\Users\\YOUR_NAME\\.local\\bin\\uv.exe",
+      "args": [
+        "run",
+        "--directory",
+        "E:\\A I-E N G G\\MCP-Server",
+        "mcp_server.py"
+      ],
+      "cwd": "E:\\A I-E N G G\\MCP-Server",
+      "env": {
+        "SERPER_API_KEY": "your_serper_api_key_here",
+        "GROQ_API_KEY": "your_groq_api_key_here"
+      }
+    }
+  }
+}
