@@ -37,7 +37,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mcp_server")
 
-# ── Windows fix ───────────────────────────────────────────────────────────────
+
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -48,12 +48,11 @@ mcp = FastMCP("docs")
 SERPER_URL = "https://google.serper.dev/search"
 
 DOCS_URLS: dict[str, str] = {
-    # NOTE: Use the exact domain Google indexes well for site: searches.
-    # Wrong domain = Serper returns 0 results even if the site exists.
-    "langchain":   "langchain.com/docs",          # was python.langchain.com/docs (not indexed)
-    "llama-index": "docs.llamaindex.ai",           # removed /en/stable (URL changed)
-    "llamaindex":  "docs.llamaindex.ai",           # removed /en/stable (URL changed)
-    "openai":      "cookbook.openai.com",          # platform.openai.com blocks site: search; cookbook is indexed
+
+    "langchain":   "langchain.com/docs",         
+    "llama-index": "docs.llamaindex.ai",          
+    "llamaindex":  "docs.llamaindex.ai",          
+    "openai":      "cookbook.openai.com",         
     "uv":          "docs.astral.sh/uv",
     "pinecone":    "docs.pinecone.io",
     "chromadb":    "docs.trychroma.com",
@@ -66,9 +65,6 @@ DOCS_URLS: dict[str, str] = {
 _JS_THRESHOLD = 500
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# SHARED HELPERS — reused by all 4 tools (DRY principle)
-# ═════════════════════════════════════════════════════════════════════════════
 
 async def search_web(query: str, num_results: int = 3) -> dict:
     payload = json.dumps({"q": query, "num": num_results})
@@ -150,15 +146,14 @@ def _validate_library(library: str) -> tuple[str, str]:
 
 
 async def _fetch_docs_links(site: str, query: str) -> list[str]:
-    # Strategy 1: site-restricted search (most accurate)
+
     results = await search_web(f"site:{site} {query}", num_results=3)
     links = [r.get("link", "") for r in results.get("organic", []) if r.get("link")]
 
     if links:
         return links
 
-    # Strategy 2: if site: search returns nothing, try open web search
-    # filtering results to only keep links that belong to the target site
+
     logger.info("site: search returned 0 results for %s — trying open search fallback", site)
     results2 = await search_web(f"{query} {site} documentation", num_results=5)
     links2 = [
@@ -182,6 +177,7 @@ async def _fetch_all_links(links: list[str]) -> list[tuple[str, str]]:
 # TOOL 1 — get_docs
 # Teaches: basic @mcp.tool(), Serper search, HTML fetching, parallel fetching
 # ═════════════════════════════════════════════════════════════════════════════
+  
 @mcp.tool()
 async def get_docs(query: str, library: str) -> str:
     """
@@ -285,13 +281,13 @@ async def compare_libraries(library_a: str, library_b: str, topic: str) -> str:
     _, site_a = _validate_library(library_a)
     _, site_b = _validate_library(library_b)
 
-    # Fetch both libraries' doc links in parallel
+
     links_a, links_b = await asyncio.gather(
         _fetch_docs_links(site_a, topic),
         _fetch_docs_links(site_b, topic),
     )
 
-    # Fetch page content for both in parallel
+   
     pairs_a, pairs_b = await asyncio.gather(
         _fetch_all_links(links_a[:2]),
         _fetch_all_links(links_b[:2]),
@@ -358,7 +354,7 @@ async def get_code_examples(query: str, library: str) -> str:
     """
     _, site = _validate_library(library)
 
-    # Enrich the query to bias search results toward code/example pages
+
     enriched_query = f"{query} example code snippet"
     links = await _fetch_docs_links(site, enriched_query)
 
@@ -389,11 +385,7 @@ async def get_code_examples(query: str, library: str) -> str:
     return code_output or "No code examples found in the retrieved documentation."
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# Entry point
-# transport="stdio" — used for Claude Desktop and client.py
-# transport="sse"   — used for HTTP / web-based clients (advanced)
-# ═════════════════════════════════════════════════════════════════════════════
+
 def main() -> None:
     mcp.run(transport="stdio")
 
