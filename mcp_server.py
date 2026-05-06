@@ -1,7 +1,5 @@
 """
 MCP Documentation Server — v0.3.0
-===================================
-Tools (all free, no extra API keys needed beyond SERPER + GROQ):
 
   1. get_docs          — Search official library documentation
   2. summarize_url     — Summarize ANY webpage by URL
